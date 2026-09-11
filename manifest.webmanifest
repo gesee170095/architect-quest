@@ -1,0 +1,22 @@
+{
+  "name": "特別区 建築史 QUEST",
+  "short_name": "建築史QUEST",
+  "description": "特別区Ⅰ類 建築職・建築史対策クイズ",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f5f5f2",
+  "theme_color": "#111827",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

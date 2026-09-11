@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="建築史QUEST">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>特別区 建築史 QUEST</title>
+  <style>
+    :root {
+      --bg:#f5f5f2; --panel:#ffffff; --card:#fafaf8; --text:#171717; --muted:#6b7280;
+      --border:#deded8; --accent:#111827; --accentText:#ffffff; --good:#166534; --bad:#991b1b;
+      --softGood:#ecfdf3; --softBad:#fef2f2; --bonus:#7c3aed;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:#111214; --panel:#181a1d; --card:#202226; --text:#f4f4f5; --muted:#a1a1aa;
+        --border:#34363b; --accent:#f4f4f5; --accentText:#111214; --good:#86efac; --bad:#fca5a5;
+        --softGood:#10271a; --softBad:#301717; --bonus:#c4b5fd;
+      }
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif}
+    body{min-height:100vh}
+    button,input{font:inherit}
+    button{cursor:pointer}
+    .app{max-width:760px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom))}
+    .topline{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:18px}
+    h1,h2,h3,p{margin-top:0}
+    .eyebrow{font-size:12px;letter-spacing:.12em;color:var(--muted);font-weight:700}
+    .title{font-size:30px;line-height:1.05;margin:4px 0 6px;font-weight:900;letter-spacing:-.03em}
+    .muted{color:var(--muted)}
+    .small{font-size:13px}
+    .panel,.card{border:1px solid var(--border);background:var(--panel);border-radius:18px}
+    .card{background:var(--card)}
+    .pad{padding:16px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
+    .stat{border:1px solid var(--border);border-radius:14px;padding:11px;background:var(--panel)}
+    .stat .n{font-size:20px;font-weight:900;margin-top:4px}
+    .level{min-width:86px;text-align:right}
+    .level strong{font-size:25px}
+    .progress{height:8px;background:var(--card);border-radius:99px;overflow:hidden;border:1px solid var(--border)}
+    .progress>div{height:100%;background:var(--accent);width:0;border-radius:99px;transition:width .25s ease}
+    .menu{border:1px solid var(--border);background:var(--panel);border-radius:18px;padding:18px;text-align:left;min-height:150px;color:var(--text)}
+    .menu strong{display:block;font-size:22px;margin:5px 0 8px}
+    .menu:active,.btn:active{transform:scale(.99)}
+    .btn{min-height:48px;border-radius:13px;padding:11px 14px;border:1px solid var(--border);background:var(--panel);color:var(--text);font-weight:750}
+    .primary{background:var(--accent);color:var(--accentText);border-color:var(--accent)}
+    .full{width:100%}
+    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .between{justify-content:space-between}
+    .quiz-card{padding:34px 18px;text-align:center;margin:14px 0 16px}
+    .question{font-size:28px;font-weight:900;line-height:1.35;letter-spacing:-.02em}
+    input{width:100%;min-height:52px;border-radius:14px;border:1px solid var(--border);background:var(--panel);color:var(--text);padding:12px 14px;font-size:16px;outline:none}
+    input:focus{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 20%,transparent)}
+    .feedback{min-height:70px;border-radius:14px;padding:14px;margin-top:12px;border:1px solid transparent}
+    .feedback.good{background:var(--softGood);color:var(--good);border-color:color-mix(in srgb,var(--good) 25%,var(--border))}
+    .feedback.bad{background:var(--softBad);color:var(--bad);border-color:color-mix(in srgb,var(--bad) 25%,var(--border))}
+    .bonus{border:1px solid var(--bonus);color:var(--bonus);border-radius:12px;padding:8px 12px;text-align:center;font-size:13px;font-weight:900;margin-top:10px}
+    .hidden{display:none!important}
+    .pill{font-size:12px;border:1px solid var(--border);border-radius:999px;padding:6px 9px;color:var(--muted)}
+    .list{display:grid;gap:8px}
+    .list-item{border:1px solid var(--border);border-radius:14px;background:var(--panel);padding:13px}
+    .rank{font-size:76px;line-height:1;font-weight:1000;text-align:center;margin:8px 0}
+    .section-title{font-size:19px;margin:0 0 10px}
+    .collection{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+    .locked{opacity:.45}
+    .footer-note{font-size:12px;color:var(--muted);line-height:1.6;margin-top:14px}
+    .danger{color:var(--bad)}
+    .xp-float{height:20px;text-align:right;font-weight:900;font-size:13px}
+    .toolbar{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+    .toolbar .btn{flex:1}
+    @media(min-width:640px){.collection{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:520px){.stats{grid-template-columns:1fr 1fr}.question{font-size:24px}.grid2{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <section id="homeView">
+    <div class="topline">
+      <div>
+        <div class="eyebrow">特別区Ⅰ類 建築職</div>
+        <h1 class="title">ARCHITECT QUEST</h1>
+        <div class="muted small">建築名から設計者を当てる20問チャレンジ</div>
+      </div>
+      <div class="level card pad">
+        <div class="eyebrow">LEVEL</div>
+        <strong>Lv.<span id="level">1</span></strong>
+      </div>
+    </div>
+
+    <div class="row between small muted"><span>EXP</span><span><span id="xpNow">0</span> / 1000</span></div>
+    <div class="progress"><div id="xpBar"></div></div>
+
+    <div class="stats">
+      <div class="stat"><div class="small muted">建築家</div><div class="n"><span id="archCount">0</span>人</div></div>
+      <div class="stat"><div class="small muted">問題</div><div class="n"><span id="buildingCount">0</span>問</div></div>
+      <div class="stat"><div class="small muted">発見済</div><div class="n"><span id="collectionCount">0</span>人</div></div>
+      <div class="stat"><div class="small muted">苦手</div><div class="n"><span id="weakCount">0</span>問</div></div>
+    </div>
+
+    <div class="grid2">
+      <button id="startNormal" class="menu">
+        <span class="eyebrow">MAIN QUEST</span>
+        <strong>20問チャレンジ</strong>
+        <span class="small muted">原則20人別々の建築家から出題。5問ごとにXP2倍。</span>
+      </button>
+      <button id="startWeak" class="menu">
+        <span class="eyebrow">REVENGE QUEST</span>
+        <strong>苦手討伐</strong>
+        <span id="weakDesc" class="small muted">間違えた問題がここに蓄積されます。</span>
+      </button>
+    </div>
+
+    <div class="toolbar">
+      <button id="collectionBtn" class="btn">建築家図鑑</button>
+      <button id="weakListBtn" class="btn">苦手リスト</button>
+      <button id="statsBtn" class="btn">成績</button>
+    </div>
+
+    <div class="toolbar">
+      <button id="exportBtn" class="btn">学習データを書き出す</button>
+      <button id="importBtn" class="btn">学習データを読み込む</button>
+      <input id="importFile" type="file" accept="application/json,.json" class="hidden">
+      <button id="resetBtn" class="btn danger">全データ初期化</button>
+    </div>
+
+    <p class="footer-note">学習データはこの端末のブラウザ内に保存されます。Safariの履歴・Webサイトデータを消去した場合などは消えることがあります。「学習データを書き出す」でバックアップできます。</p>
+  </section>
+
+  <section id="quizView" class="hidden">
+    <div class="row between">
+      <button id="quizHome" class="btn">← ホーム</button>
+      <div class="small muted" style="text-align:right"><div id="modeLabel">MAIN QUEST</div><strong><span id="qNo">1</span> / <span id="qTotal">20</span></strong></div>
+    </div>
+    <div class="stats" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat"><div class="small muted">SCORE</div><div class="n" id="score">0</div></div>
+      <div class="stat"><div class="small muted">COMBO</div><div class="n"><span id="combo">0</span>🔥</div></div>
+      <div class="stat"><div class="small muted">EXP</div><div class="n">+<span id="setXp">0</span></div></div>
+    </div>
+    <div class="progress"><div id="quizProgress"></div></div>
+    <div id="bonus" class="bonus hidden">⚡ BONUS QUESTION — XP 2倍</div>
+    <div id="notice" class="small muted" style="min-height:20px;margin-top:10px"></div>
+    <div class="quiz-card card">
+      <div class="eyebrow">この建築の設計者は？</div>
+      <div id="question" class="question"></div>
+      <div id="xpFloat" class="xp-float"></div>
+    </div>
+    <form id="answerForm">
+      <input id="answerInput" autocomplete="off" autocapitalize="none" placeholder="建築家名を入力">
+      <div class="toolbar">
+        <button class="btn primary" type="submit" id="answerBtn">答える</button>
+        <button class="btn" type="button" id="nextBtn">次の問題 →</button>
+      </div>
+      <button class="btn full" type="button" id="revealBtn" style="margin-top:8px">答えを見る</button>
+    </form>
+    <div id="feedback" class="feedback"></div>
+  </section>
+
+  <section id="resultView" class="hidden">
+    <button id="resultHome" class="btn">← ホーム</button>
+    <div class="rank" id="rank">S</div>
+    <div class="eyebrow" style="text-align:center">QUEST RANK</div>
+    <h2 style="text-align:center;margin:18px 0 6px"><span id="resultScore">0</span> / <span id="resultTotal">20</span></h2>
+    <p id="resultText" class="muted small" style="text-align:center"></p>
+    <div class="card pad" style="text-align:center;margin:16px 0"><span class="muted small">獲得EXP</span> <strong style="font-size:24px">+<span id="resultXp">0</span></strong></div>
+    <div class="grid2">
+      <button id="againBtn" class="btn primary">次の20問</button>
+      <button id="reviewWrongBtn" class="btn">今回の間違い</button>
+    </div>
+    <div id="wrongResult" class="list hidden" style="margin-top:16px"></div>
+  </section>
+
+  <section id="collectionView" class="hidden">
+    <div class="row between"><button id="collectionHome" class="btn">← ホーム</button><span class="small muted"><span id="foundCount">0</span> / <span id="allArchCount">0</span>人</span></div>
+    <h2 style="margin-top:18px">建築家図鑑</h2>
+    <p class="small muted">一度でも正解した建築家がアンロックされます。</p>
+    <div id="collectionGrid" class="collection"></div>
+  </section>
+
+  <section id="weakView" class="hidden">
+    <div class="row between"><button id="weakHome" class="btn">← ホーム</button><span class="small muted"><span id="weakListCount">0</span>問</span></div>
+    <h2 style="margin-top:18px">苦手リスト</h2>
+    <p class="small muted">ミス回数が多い順です。苦手討伐で優先出題されます。</p>
+    <div id="weakList" class="list"></div>
+  </section>
+
+  <section id="statsView" class="hidden">
+    <button id="statsHome" class="btn">← ホーム</button>
+    <h2 style="margin-top:18px">成績</h2>
+    <div class="stats" style="grid-template-columns:1fr 1fr">
+      <div class="stat"><div class="small muted">総回答数</div><div class="n" id="totalAnswered">0</div></div>
+      <div class="stat"><div class="small muted">総正解数</div><div class="n" id="totalCorrect">0</div></div>
+      <div class="stat"><div class="small muted">通算正答率</div><div class="n"><span id="accuracy">0</span>%</div></div>
+      <div class="stat"><div class="small muted">最高得点</div><div class="n"><span id="bestScore">0</span>/20</div></div>
+      <div class="stat"><div class="small muted">最高コンボ</div><div class="n"><span id="bestCombo">0</span>🔥</div></div>
+      <div class="stat"><div class="small muted">QUEST回数</div><div class="n" id="runs">0</div></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const BANK = [{"architect": "菊竹清訓", "buildings": ["スカイハウス", "出雲大社 庁の舎", "東光園", "都城市民会館", "萩市民会館", "江戸東京博物館"]}, {"architect": "吉阪隆正", "buildings": ["吉阪自邸", "ヴィラ・クゥクゥ", "江津市庁舎", "アテネ・フランセ", "大学セミナー・ハウス本館"]}, {"architect": "白井晟一", "buildings": ["旧秋ノ宮村役場", "旧松井田町役場", "浅草善照寺本堂", "親和銀行大波止支店", "親和銀行本店", "ノア・ビル", "静岡市立芹沢銈介美術館", "渋谷区立松濤美術館"]}, {"architect": "山田守", "buildings": ["東京中央電信局", "東京逓信病院", "日本武道館", "京都タワー"]}, {"architect": "吉田五十八", "buildings": ["日本芸術院会館", "五島美術館", "大和文華館", "成田山新勝寺大本堂"]}, {"architect": "大高正人", "buildings": ["坂出人工土地", "千葉県文化会館", "千葉県立中央図書館", "千葉県立美術館", "群馬県立歴史博物館"]}, {"architect": "谷口吉郎", "buildings": ["藤村記念堂", "秩父セメント第2工場", "東京国立博物館 東洋館", "東京国立近代美術館"]}, {"architect": "吉村順三", "buildings": ["軽井沢の山荘", "愛知県立芸術大学", "八ヶ岳高原音楽堂"]}, {"architect": "内井昭蔵", "buildings": ["桜台コートビレジ", "身延山久遠寺 宝蔵", "世田谷美術館", "国際日本文化研究センター", "大分市美術館"]}, {"architect": "大江宏", "buildings": ["法政大学55年館", "法政大学58年館", "普連土学園校舎", "国立能楽堂"]}, {"architect": "今井兼次", "buildings": ["早稲田大学旧図書館（現・會津八一記念博物館）", "碌山美術館", "大多喜町役場中庁舎", "日本二十六聖人殉教記念館", "桃華楽堂"]}, {"architect": "浦辺鎮太郎", "buildings": ["大原美術館分館", "倉敷国際ホテル", "倉敷市民会館", "倉敷アイビースクエア", "倉敷市庁舎"]}, {"architect": "篠原一男", "buildings": ["から傘の家", "土間の家", "白の家", "上原通りの住宅", "東京工業大学百年記念館"]}, {"architect": "西沢立衛", "buildings": ["ウィークエンドハウス", "森山邸", "十和田市現代美術館", "豊島美術館", "軽井沢千住博美術館"]}, {"architect": "伊東忠太", "buildings": ["一橋大学兼松講堂", "大倉集古館", "祇園閣", "東京都慰霊堂", "築地本願寺"]}, {"architect": "片山東熊", "buildings": ["奈良国立博物館 なら仏像館", "京都国立博物館 明治古都館", "東京国立博物館 表慶館", "迎賓館赤坂離宮"]}, {"architect": "ジョサイア・コンドル", "buildings": ["鹿鳴館", "ニコライ堂", "三菱一号館（初代）", "旧岩崎邸庭園 洋館", "旧岩崎邸庭園 撞球室", "旧古河邸 洋館", "綱町三井倶楽部", "六華苑 洋館"]}, {"architect": "渡辺仁", "buildings": ["ホテルニューグランド本館", "旧服部時計店（現・SEIKO HOUSE銀座）", "日本劇場", "東京国立博物館 本館", "原邦造邸（旧原美術館）"]}, {"architect": "内田祥三", "buildings": ["東京大学総合図書館", "東京大学医学部1号館", "東京大学工学部1号館", "東京大学法文1号館"]}, {"architect": "佐藤功一", "buildings": ["岩手県公会堂", "市政会館・日比谷公会堂", "群馬県庁昭和庁舎", "栃木県庁昭和館"]}, {"architect": "吉田鉄郎", "buildings": ["旧京都中央電話局上分局", "旧京都中央電話局", "別府市公会堂", "東京中央郵便局", "大阪中央郵便局"]}, {"architect": "岡田信一郎", "buildings": ["歌舞伎座（第3期）", "鳩山会館", "黒田記念館", "東京美術学校陳列館", "東京府美術館（旧館）"]}, {"architect": "堀口捨己", "buildings": ["小出邸", "紫烟荘", "岡田邸", "常滑市立陶芸研究所"]}, {"architect": "安井武雄", "buildings": ["大阪倶楽部", "高麗橋野村ビルディング", "日本橋野村ビルディング", "大阪瓦斯ビルヂング南館"]}, {"architect": "W.M.ヴォーリズ", "buildings": ["日本基督教団大阪教会", "神戸女学院文学館", "関西学院時計台", "旧大丸心斎橋店本館", "東華菜館", "山の上ホテル"]}, {"architect": "アントニン・レーモンド", "buildings": ["東京女子大学本館", "群馬音楽センター", "聖アンセルモ教会", "新発田カトリック教会", "南山大学神言神学院"]}, {"architect": "芦原義信", "buildings": ["駒沢オリンピック公園総合運動場体育館", "ソニービル", "国立歴史民俗博物館", "東京芸術劇場"]}, {"architect": "高松伸", "buildings": ["仁科歯科医院 ARK", "キリンプラザ大阪", "くにびきメッセ", "植田正治写真美術館", "国立劇場おきなわ"]}, {"architect": "清家清", "buildings": ["私の家", "森博士の家", "斎藤助教授の家"]}, {"architect": "宮脇檀", "buildings": ["松川ボックス", "ブルーボックスハウス"]}, {"architect": "毛綱毅曠", "buildings": ["反住器", "釧路市立博物館", "釧路市湿原展望台"]}, {"architect": "六角鬼丈", "buildings": ["金光教福岡高宮教会", "東京武道館", "東京藝術大学大学美術館", "感覚ミュージアム"]}, {"architect": "藤井厚二", "buildings": ["聴竹居"]}, {"architect": "遠藤新", "buildings": ["甲子園会館（旧甲子園ホテル）"]}, {"architect": "三分一博志", "buildings": ["犬島精錬所美術館", "宮島弥山展望休憩所", "直島ホール", "おりづるタワー"]}, {"architect": "新居千秋", "buildings": ["黒部市国際文化センター コラーレ"]}, {"architect": "石上純也", "buildings": ["神奈川工科大学 KAIT工房", "神奈川工科大学 KAIT広場"]}, {"architect": "平田晃久", "buildings": ["太田市美術館・図書館"]}, {"architect": "中村拓志", "buildings": ["Ribbon Chapel", "狭山の森 礼拝堂"]}, {"architect": "ル・コルビュジエ", "buildings": ["国立西洋美術館本館"]}, {"architect": "ラファエル・ヴィニオリ", "buildings": ["東京国際フォーラム"]}, {"architect": "アルド・ロッシ", "buildings": ["ホテル・イル・パラッツォ"]}, {"architect": "マリオ・ボッタ", "buildings": ["ワタリウム美術館"]}];
+const ALIASES = {"前川國男": ["前川国男"], "ジョサイア・コンドル": ["ジョサイアコンドル", "コンドル"], "W.M.ヴォーリズ": ["WMヴォーリズ", "W.M.ボーリズ", "ヴォーリズ", "ボーリズ"], "アントニン・レーモンド": ["アントニンレーモンド", "レーモンド"], "ル・コルビュジエ": ["ルコルビュジエ", "コルビュジエ"], "ラファエル・ヴィニオリ": ["ラファエルヴィニオリ", "ヴィニオリ"], "アルド・ロッシ": ["アルドロッシ", "ロッシ"], "マリオ・ボッタ": ["マリオボッタ", "ボッタ"]};
+const STORAGE_KEY = "tokubetsuku_architect_quest_v1";
+
+const Q = [];
+let qid = 0;
+for (const group of BANK) {
+  for (const building of group.buildings) {
+    Q.push({id: qid++, architect: group.architect, building});
+  }
+}
+const byArchitect = new Map();
+for (const q of Q) {
+  if (!byArchitect.has(q.architect)) byArchitect.set(q.architect, []);
+  byArchitect.get(q.architect).push(q);
+}
+const architects = [...byArchitect.keys()];
+
+const DEFAULT_STATE = {
+  xp:0, collection:[], weak:{}, totalAnswered:0, totalCorrect:0,
+  bestScore:0, bestCombo:0, runs:0, questionHistory:[], version:1
+};
+function loadState(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return structuredClone(DEFAULT_STATE);
+    const parsed = JSON.parse(raw);
+    return Object.assign(structuredClone(DEFAULT_STATE), parsed);
+  } catch(e) {
+    return structuredClone(DEFAULT_STATE);
+  }
+}
+let state = loadState();
+function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+const $ = id => document.getElementById(id);
+const views = ["homeView","quizView","resultView","collectionView","weakView","statsView"];
+function show(id){ for(const v of views) $(v).classList.toggle("hidden", v!==id); window.scrollTo(0,0); }
+function shuffle(a){
+  const b=[...a];
+  for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}
+  return b;
+}
+function norm(s){
+  return String(s||"").normalize("NFKC").toLowerCase()
+    .replace(/[・･.\s　,，、&＆＋+\-ー()（）]/g,"");
+}
+function accepted(q, user){
+  const list=[q.architect,...(ALIASES[q.architect]||[])].map(norm);
+  return list.includes(norm(user));
+}
+function level(){ return Math.floor(state.xp/1000)+1; }
+function levelXp(){ return state.xp%1000; }
+
+let archPool = shuffle(architects);
+let workQueues = new Map();
+let currentSet=[], idx=0, score=0, combo=0, setXp=0, graded=false, mode="normal", wrongThisSet=[], carry="";
+function nextWork(architect){
+  let queue=workQueues.get(architect)||[];
+  if(!queue.length) queue=shuffle(byArchitect.get(architect));
+  const q=queue.pop(); workQueues.set(architect,queue); return q;
+}
+function normalSet(){
+  const used=new Set(), out=[];
+  while(out.length<20){
+    if(!archPool.length) archPool=shuffle(architects);
+    const a=archPool.pop();
+    if(used.has(a)) continue;
+    used.add(a); out.push(nextWork(a));
+  }
+  return out;
+}
+function weakQuestions(){
+  return Object.values(state.weak).sort((a,b)=>b.misses-a.misses);
+}
+function weakSet(){
+  const source=weakQuestions().map(w=>Q.find(q=>q.id===w.id)).filter(Boolean);
+  if(!source.length) return [];
+  let out=[];
+  while(out.length<20) out.push(...shuffle(source));
+  return out.slice(0,20);
+}
+function refreshHome(){
+  $("archCount").textContent=architects.length;
+  $("buildingCount").textContent=Q.length;
+  $("collectionCount").textContent=state.collection.length;
+  $("weakCount").textContent=Object.keys(state.weak).length;
+  $("level").textContent=level();
+  $("xpNow").textContent=levelXp();
+  $("xpBar").style.width=(levelXp()/10)+"%";
+  const wc=Object.keys(state.weak).length;
+  $("weakDesc").textContent=wc ? `現在 ${wc}問。ミスの多い問題を優先出題します。` : "間違えた問題がここに蓄積されます。";
+}
+function startQuiz(m){
+  mode=m;
+  currentSet=m==="weak"?weakSet():normalSet();
+  if(!currentSet.length){
+    alert("まだ苦手問題がありません。まず20問チャレンジに挑戦してください。");
+    return;
+  }
+  idx=0;score=0;combo=0;setXp=0;graded=false;wrongThisSet=[];carry="";
+  $("modeLabel").textContent=m==="weak"?"REVENGE QUEST":"MAIN QUEST";
+  $("qTotal").textContent=currentSet.length;
+  show("quizView"); renderQuestion();
+}
+function renderQuestion(){
+  const q=currentSet[idx];
+  $("qNo").textContent=idx+1;
+  $("question").textContent=q.building;
+  $("answerInput").value="";
+  $("answerInput").disabled=false;
+  $("answerBtn").disabled=false;
+  $("revealBtn").disabled=false;
+  $("feedback").textContent="";
+  $("feedback").className="feedback";
+  $("notice").textContent=carry; carry="";
+  $("score").textContent=score;
+  $("combo").textContent=combo;
+  $("setXp").textContent=setXp;
+  $("quizProgress").style.width=((idx+1)/currentSet.length*100)+"%";
+  $("bonus").classList.toggle("hidden",(idx+1)%5!==0);
+  $("xpFloat").textContent="";
+  graded=false;
+  setTimeout(()=>$("answerInput").focus(),50);
+}
+function addWeak(q,user){
+  const key=String(q.id);
+  const old=state.weak[key]||{id:q.id, misses:0, clears:0, lastWrong:""};
+  old.misses += 1;
+  old.lastWrong = user || "未回答";
+  state.weak[key]=old;
+}
+function markCorrectInWeak(q){
+  const key=String(q.id);
+  if(state.weak[key]) state.weak[key].clears=(state.weak[key].clears||0)+1;
+}
+function grade(ok,user,reason){
+  if(graded)return;
+  graded=true;
+  const q=currentSet[idx];
+  state.totalAnswered++;
+  if(ok){
+    state.totalCorrect++; score++; combo++;
+    state.bestCombo=Math.max(state.bestCombo,combo);
+    if(!state.collection.includes(q.architect)) state.collection.push(q.architect);
+    if(mode==="weak") markCorrectInWeak(q);
+    const bonus=(idx+1)%5===0;
+    const gain=(100+Math.min(combo-1,10)*20)*(bonus?2:1);
+    state.xp += gain; setXp += gain;
+    $("xpFloat").textContent=`+${gain} XP`;
+    $("feedback").textContent=`○ 正解！　${q.architect}　COMBO ${combo}🔥${bonus?"　BONUS!":""}`;
+    $("feedback").className="feedback good";
+  } else {
+    combo=0; addWeak(q,user);
+    wrongThisSet.push({q,user:user||"未回答"});
+    $("feedback").textContent=`× ${reason||"不正解"}　正解：${q.architect}`;
+    $("feedback").className="feedback bad";
+  }
+  $("score").textContent=score;$("combo").textContent=combo;$("setXp").textContent=setXp;
+  $("answerInput").disabled=true;$("answerBtn").disabled=true;$("revealBtn").disabled=true;
+  saveState();
+}
+function nextQuestion(){
+  if(!graded){
+    const q=currentSet[idx];
+    grade(false,"未回答","未回答 → 苦手登録");
+    carry=`「${q.building}」は未回答のため苦手問題に追加しました。`;
+  }
+  if(idx>=currentSet.length-1){ finish(); return; }
+  idx++; renderQuestion();
+}
+function finish(){
+  state.bestScore=Math.max(state.bestScore,score);
+  state.runs++;
+  saveState();
+  const rank=score>=18?"S":score>=16?"A":score>=13?"B":score>=10?"C":"D";
+  $("rank").textContent=rank;
+  $("resultScore").textContent=score;$("resultTotal").textContent=currentSet.length;
+  $("resultXp").textContent=setXp;
+  $("resultText").textContent=`正答率 ${Math.round(score/currentSet.length*100)}% ／ 苦手 ${Object.keys(state.weak).length}問`;
+  $("againBtn").textContent=mode==="weak"?"苦手討伐をもう一度":"次の20問";
+  $("wrongResult").classList.add("hidden");
+  $("wrongResult").innerHTML="";
+  for(const x of wrongThisSet){
+    const d=document.createElement("div");d.className="list-item";
+    d.innerHTML=`<strong></strong><div class="small muted" style="margin-top:4px"></div>`;
+    d.querySelector("strong").textContent=x.q.building;
+    d.querySelector(".muted").textContent=`正解：${x.q.architect} ／ あなた：${x.user}`;
+    $("wrongResult").appendChild(d);
+  }
+  show("resultView");
+}
+function renderCollection(){
+  $("foundCount").textContent=state.collection.length;$("allArchCount").textContent=architects.length;
+  const g=$("collectionGrid");g.innerHTML="";
+  for(const a of architects){
+    const unlocked=state.collection.includes(a);
+    const d=document.createElement("div");d.className="list-item"+(unlocked?"":" locked");
+    const label=document.createElement("div");label.className="eyebrow";label.textContent=unlocked?"UNLOCKED":"LOCKED";
+    const name=document.createElement("strong");name.style.display="block";name.style.marginTop="5px";name.textContent=unlocked?a:"？？？";
+    d.append(label,name);g.appendChild(d);
+  }
+}
+function renderWeak(){
+  const arr=weakQuestions();$("weakListCount").textContent=arr.length;const list=$("weakList");list.innerHTML="";
+  if(!arr.length){const d=document.createElement("div");d.className="list-item muted small";d.textContent="まだ苦手問題はありません。";list.appendChild(d);return;}
+  for(const w of arr){
+    const q=Q.find(x=>x.id===w.id);if(!q)continue;
+    const d=document.createElement("div");d.className="list-item";
+    const row=document.createElement("div");row.className="row between";
+    const left=document.createElement("div");left.style.minWidth="0";
+    const b=document.createElement("strong");b.textContent=q.building;
+    const a=document.createElement("div");a.className="small muted";a.style.marginTop="4px";a.textContent=`${q.architect} ／ ミス ${w.misses}回 ／ 討伐 ${w.clears||0}回`;
+    left.append(b,a);
+    const rm=document.createElement("button");rm.className="btn";rm.style.minHeight="38px";rm.textContent="解除";
+    rm.addEventListener("click",()=>{delete state.weak[String(q.id)];saveState();renderWeak();refreshHome();});
+    row.append(left,rm);d.appendChild(row);list.appendChild(d);
+  }
+}
+function renderStats(){
+  $("totalAnswered").textContent=state.totalAnswered;
+  $("totalCorrect").textContent=state.totalCorrect;
+  $("accuracy").textContent=state.totalAnswered?Math.round(state.totalCorrect/state.totalAnswered*100):0;
+  $("bestScore").textContent=state.bestScore;
+  $("bestCombo").textContent=state.bestCombo;
+  $("runs").textContent=state.runs;
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);const a=document.createElement("a");
+  a.href=url;a.download="architect-quest-progress.json";document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),500);
+}
+async function importData(file){
+  try{
+    const parsed=JSON.parse(await file.text());
+    if(!parsed || typeof parsed!=="object") throw new Error("invalid");
+    state=Object.assign(structuredClone(DEFAULT_STATE),parsed);
+    if(!Array.isArray(state.collection)) state.collection=[];
+    if(!state.weak || typeof state.weak!=="object") state.weak={};
+    saveState();refreshHome();
+    alert("学習データを復元しました。");
+  }catch(e){
+    alert("学習データを読み込めませんでした。ARCHITECT QUESTから書き出したJSONを選んでください。");
+  }
+}
+$("startNormal").addEventListener("click",()=>startQuiz("normal"));
+$("startWeak").addEventListener("click",()=>startQuiz("weak"));
+$("quizHome").addEventListener("click",()=>{refreshHome();show("homeView")});
+$("answerForm").addEventListener("submit",e=>{e.preventDefault();if(graded)return;const u=$("answerInput").value.trim();if(!u){grade(false,"未回答","未回答 → 苦手登録");return}grade(accepted(currentSet[idx],u),u,"不正解")});
+$("nextBtn").addEventListener("click",nextQuestion);
+$("revealBtn").addEventListener("click",()=>grade(false,"答えを見る","答えを見る → 苦手登録"));
+$("resultHome").addEventListener("click",()=>{refreshHome();show("homeView")});
+$("againBtn").addEventListener("click",()=>startQuiz(mode));
+$("reviewWrongBtn").addEventListener("click",()=>$("wrongResult").classList.toggle("hidden"));
+$("collectionBtn").addEventListener("click",()=>{renderCollection();show("collectionView")});
+$("collectionHome").addEventListener("click",()=>{refreshHome();show("homeView")});
+$("weakListBtn").addEventListener("click",()=>{renderWeak();show("weakView")});
+$("weakHome").addEventListener("click",()=>{refreshHome();show("homeView")});
+$("statsBtn").addEventListener("click",()=>{renderStats();show("statsView")});
+$("statsHome").addEventListener("click",()=>{refreshHome();show("homeView")});
+$("exportBtn").addEventListener("click",exportData);
+$("importBtn").addEventListener("click",()=>$("importFile").click());
+$("importFile").addEventListener("change",e=>{
+  const file=e.target.files&&e.target.files[0];
+  if(file) importData(file);
+  e.target.value="";
+});
+$("resetBtn").addEventListener("click",()=>{
+  if(confirm("苦手・XP・図鑑・成績をすべて初期化しますか？")){
+    state=structuredClone(DEFAULT_STATE);saveState();refreshHome();
+  }
+});
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+}
+refreshHome();show("homeView");
+</script>
+</body>
+</html>
