@@ -71,6 +71,14 @@
     .collection{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
     .locked{opacity:.45}
     .footer-note{font-size:12px;color:var(--muted);line-height:1.6;margin-top:14px}
+    details.db-card{border:1px solid var(--border);border-radius:15px;background:var(--panel);overflow:hidden}
+    details.db-card summary{list-style:none;cursor:pointer;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:850}
+    details.db-card summary::-webkit-details-marker{display:none}
+    .db-count{font-size:11px;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:4px 8px;white-space:nowrap}
+    .db-buildings{border-top:1px solid var(--border);padding:8px 14px 12px}
+    .db-building{padding:8px 0;border-bottom:1px solid var(--border);font-size:14px;line-height:1.45}
+    .db-building:last-child{border-bottom:0}
+    .db-index{display:inline-flex;width:25px;height:25px;border-radius:50%;align-items:center;justify-content:center;border:1px solid var(--border);font-size:11px;color:var(--muted);margin-right:8px}
     .danger{color:var(--bad)}
     .xp-float{height:20px;text-align:right;font-weight:900;font-size:13px}
     .toolbar{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
@@ -118,6 +126,7 @@
     </div>
 
     <div class="toolbar">
+      <button id="databaseBtn" class="btn primary">問題一覧</button>
       <button id="collectionBtn" class="btn">建築家図鑑</button>
       <button id="weakListBtn" class="btn">苦手リスト</button>
       <button id="statsBtn" class="btn">成績</button>
@@ -190,6 +199,22 @@
     <div id="weakList" class="list"></div>
   </section>
 
+  <section id="databaseView" class="hidden">
+    <div class="row between">
+      <button id="databaseHome" class="btn">← ホーム</button>
+      <span class="small muted"><span id="databaseArchCount">0</span>人・<span id="databaseQuestionCount">0</span>問</span>
+    </div>
+    <h2 style="margin-top:18px;margin-bottom:6px">問題一覧</h2>
+    <p class="small muted">ゲームに入っている「建築家 → 建築」をすべて確認できます。建築家名・建築名のどちらでも検索できます。</p>
+    <input id="databaseSearch" type="search" placeholder="建築家・建築名で検索" style="margin:8px 0 12px">
+    <div class="row" style="margin-bottom:12px">
+      <button id="expandAllBtn" class="btn" style="min-height:40px">すべて開く</button>
+      <button id="collapseAllBtn" class="btn" style="min-height:40px">すべて閉じる</button>
+    </div>
+    <div id="databaseList" class="list"></div>
+    <div id="databaseEmpty" class="list-item muted small hidden">該当する建築家・建築がありません。</div>
+  </section>
+
   <section id="statsView" class="hidden">
     <button id="statsHome" class="btn">← ホーム</button>
     <h2 style="margin-top:18px">成績</h2>
@@ -241,7 +266,7 @@ let state = loadState();
 function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 
 const $ = id => document.getElementById(id);
-const views = ["homeView","quizView","resultView","collectionView","weakView","statsView"];
+const views = ["homeView","quizView","resultView","collectionView","weakView","databaseView","statsView"];
 function show(id){ for(const v of views) $(v).classList.toggle("hidden", v!==id); window.scrollTo(0,0); }
 function shuffle(a){
   const b=[...a];
@@ -424,6 +449,51 @@ function renderWeak(){
     row.append(left,rm);d.appendChild(row);list.appendChild(d);
   }
 }
+function renderDatabase(query=""){
+  const needle=norm(query);
+  const list=$("databaseList");
+  list.innerHTML="";
+  let shownArchitects=0, shownQuestions=0;
+  for(const group of BANK){
+    const architectMatch=!needle || norm(group.architect).includes(needle);
+    const matchingBuildings=architectMatch ? [...group.buildings] : group.buildings.filter(b=>norm(b).includes(needle));
+    if(!matchingBuildings.length) continue;
+    shownArchitects++;
+    shownQuestions += matchingBuildings.length;
+    const details=document.createElement("details");
+    details.className="db-card";
+    if(needle) details.open=true;
+    const summary=document.createElement("summary");
+    const name=document.createElement("span");
+    name.textContent=group.architect;
+    const count=document.createElement("span");
+    count.className="db-count";
+    count.textContent=`${matchingBuildings.length}作品`;
+    summary.append(name,count);
+    const works=document.createElement("div");
+    works.className="db-buildings";
+    matchingBuildings.forEach((building,i)=>{
+      const row=document.createElement("div");
+      row.className="db-building";
+      const no=document.createElement("span");
+      no.className="db-index";
+      no.textContent=i+1;
+      const text=document.createElement("span");
+      text.textContent=building;
+      row.append(no,text);
+      works.appendChild(row);
+    });
+    details.append(summary,works);
+    list.appendChild(details);
+  }
+  $("databaseArchCount").textContent=shownArchitects;
+  $("databaseQuestionCount").textContent=shownQuestions;
+  $("databaseEmpty").classList.toggle("hidden",shownArchitects!==0);
+}
+function setAllDatabaseDetails(open){
+  document.querySelectorAll("#databaseList details.db-card").forEach(d=>d.open=open);
+}
+
 function renderStats(){
   $("totalAnswered").textContent=state.totalAnswered;
   $("totalCorrect").textContent=state.totalCorrect;
@@ -460,6 +530,11 @@ $("revealBtn").addEventListener("click",()=>grade(false,"答えを見る","答�
 $("resultHome").addEventListener("click",()=>{refreshHome();show("homeView")});
 $("againBtn").addEventListener("click",()=>startQuiz(mode));
 $("reviewWrongBtn").addEventListener("click",()=>$("wrongResult").classList.toggle("hidden"));
+$("databaseBtn").addEventListener("click",()=>{$("databaseSearch").value="";renderDatabase("");show("databaseView")});
+$("databaseHome").addEventListener("click",()=>{refreshHome();show("homeView")});
+$("databaseSearch").addEventListener("input",e=>renderDatabase(e.target.value));
+$("expandAllBtn").addEventListener("click",()=>setAllDatabaseDetails(true));
+$("collapseAllBtn").addEventListener("click",()=>setAllDatabaseDetails(false));
 $("collectionBtn").addEventListener("click",()=>{renderCollection();show("collectionView")});
 $("collectionHome").addEventListener("click",()=>{refreshHome();show("homeView")});
 $("weakListBtn").addEventListener("click",()=>{renderWeak();show("weakView")});
